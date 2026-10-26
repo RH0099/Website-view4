@@ -1,0 +1,31 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ] # আপনার ব্রাঞ্চের নাম অনুযায়ী পরিবর্তন করুন
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --- আপনার অন্যান্য কাস্টম স্টেপ বা কমান্ড এখানে যোগ করুন ---
+      - name: Run custom setup or build tasks
+        run: |
+          echo "এখানে আপনার অন্যান্য কমান্ড বা স্ক্রিপ্ট রান করাতে পারেন..."
+          # যেমন: npm install ইত্যাদি প্রয়োজন হলে দিতে পারেন
+
+      # --- সিক্রেট ইনজেকশন স্টেপ (ডিপ্লয়মেন্টের আগে) ---
+      - name: Inject Secrets into index.html
+        run: |
+          sed -i 's|__BOT_TOKEN__|${{ secrets.BOT_TOKEN }}|g' index.html
+          sed -i 's|__CHAT_ID__|${{ secrets.CHAT_ID }}|g' index.html
+
+      # --- ফাইনাল ডিপ্লয়মেন্ট স্টেপ (সবার শেষে) ---
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
